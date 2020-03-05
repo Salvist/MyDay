@@ -1,5 +1,6 @@
 package com.diary.myday;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -11,6 +12,7 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
+    @SuppressLint("SimpleDateFormat")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
         if(date.charAt(0) == '0'){
             date = date.substring(1);
         }
-        dateTimeDisplay.setText("Day " + date);
+        date = "Day " + date;
+        dateTimeDisplay.setText(date);
     }
 }
