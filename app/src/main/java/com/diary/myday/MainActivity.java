@@ -12,8 +12,4 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    public static void textBox(){
-        android.content.Context(); //testing purpose only
-    }
-
 }
