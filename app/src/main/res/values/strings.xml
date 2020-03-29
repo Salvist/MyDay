@@ -3,4 +3,8 @@
     <string name="diary">Type your Diary here!</string>
     <string name="save">Save Diary!</string>
     <string name="load">Load</string>
+    <string name="question">How do you feel today?</string>
+    <string name="happy">HAPPY</string>
+    <string name="okay">OKAY</string>
+    <string name="sad">SAD</string>
 </resources>

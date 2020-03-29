@@ -3,6 +3,7 @@ package com.diary.myday;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.InputMismatchException;
 
 public class MainActivity extends AppCompatActivity {
     private static final String FILE_NAME = "text.txt";
@@ -102,4 +102,22 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
+        public void happy(View view){
+        Button happyBtn = (Button) findViewById(R.id.happyBtn);
+        //reward a smiley sticker
+    }
+
+
+        public void okay(View view){
+            Button okayBtn = (Button) findViewById(R.id.okayBtn);
+            //go into the diary box page
+        }
+
+        public void sad(View view){
+        Button sadBtn = (Button) findViewById(R.id.sadBtn);
+        //go into minigame
+        }
+
 }
