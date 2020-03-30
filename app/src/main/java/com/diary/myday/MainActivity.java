@@ -103,6 +103,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void menu(View v){
+        setContentView(R.layout.menu);
+    }
+
+    public void create(View v){
+        setContentView(R.layout.activity_main);
+    }
 
         public void happy(View view){
         Button happyBtn = (Button) findViewById(R.id.happyBtn);

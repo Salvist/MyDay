@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">My Day</string>
+    <string name="app_desc">Digital diary for your memories!</string>
     <string name="diary">Type your Diary here!</string>
+
+    <string name="create">Write a diary!</string>
+    <string name="open">Open Diary</string>
+    <string name="setting">Settings</string>
+
     <string name="save">Save Diary!</string>
     <string name="load">Load</string>
     <string name="question">How do you feel today?</string>
