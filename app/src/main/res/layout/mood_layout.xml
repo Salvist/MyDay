@@ -32,6 +32,7 @@
 
     <Button
         android:id="@+id/happyBtn"
+        android:onClick="create"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="145dp"
@@ -48,6 +49,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:onClick="create"
         android:id="@+id/okayBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -63,6 +65,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
     <Button
         android:id="@+id/sadBtn"

@@ -113,12 +113,14 @@ public class MainActivity extends AppCompatActivity {
 
         public void happy(View view){
         Button happyBtn = (Button) findViewById(R.id.happyBtn);
+            setContentView(R.layout.activity_main);
         //reward a smiley sticker
     }
 
 
         public void okay(View view){
-            Button okayBtn = (Button) findViewById(R.id.okayBtn);
+          //  Button okayBtn = (Button) findViewById(R.id.okayBtn);
+            setContentView(R.layout.activity_main);
             //go into the diary box page
         }
 
