@@ -107,6 +107,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.menu);
     }
 
+    public void mood(View v){
+        setContentView(R.layout.mood_layout);
+    }
+
     public void create(View v){
         setContentView(R.layout.activity_main);
     }
