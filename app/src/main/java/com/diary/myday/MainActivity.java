@@ -1,6 +1,8 @@
 package com.diary.myday;
 
 import android.annotation.SuppressLint;
+import android.icu.util.Calendar;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,6 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
@@ -17,23 +20,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
     private static final String FILE_NAME = "text.txt";
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("SimpleDateFormat")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+/*
         TextView dateTimeDisplay;
         Calendar calendar;
         SimpleDateFormat dateFormat;
         String date;
-
         dateTimeDisplay = (TextView) findViewById(R.id.dayIndicator);
         calendar = Calendar.getInstance();
         dateFormat = new SimpleDateFormat("dd");
@@ -43,10 +45,26 @@ public class MainActivity extends AppCompatActivity {
         }
         date = "Day " + date;
         dateTimeDisplay.setText(date);
-
         //save edit text
+*/
+
+
+        TextView dateTimeDisplay;
+        Calendar calendar;
+        SimpleDateFormat dateFormat;
+        String date;
+        int day;
+        String dayCount;
+        dateTimeDisplay = (TextView) findViewById(R.id.dayIndicator);
+        calendar = Calendar.getInstance();
+        dateFormat = new SimpleDateFormat("dd MMMM yyyy");
+        date = dateFormat.format(calendar.getTime());
+        day = calendar.get(Calendar.DAY_OF_YEAR);
+        dayCount = "Day "+ day + "\t" + date;
+        dateTimeDisplay.setText(dayCount);
 
     }
+
 
     public void save(View v) throws IOException {
         EditText dEditText = findViewById(R.id.diary);
