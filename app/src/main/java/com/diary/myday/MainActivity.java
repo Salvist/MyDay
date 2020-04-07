@@ -1,6 +1,7 @@
 package com.diary.myday;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.icu.util.Calendar;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,10 +13,12 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -24,8 +27,7 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
-
+public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.ItemClickListener{
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -41,52 +43,50 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
+    private static String FILE_NAME = "diary_";
+    private static String FILE_DIR;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("SimpleDateFormat")
     public void create_diary(View v){
         setContentView(R.layout.create_diary);
-/*
-        TextView dateTimeDisplay;
-        Calendar calendar;
-        SimpleDateFormat dateFormat;
-        String date;
-        dateTimeDisplay = (TextView) findViewById(R.id.dayIndicator);
-        calendar = Calendar.getInstance();
-        dateFormat = new SimpleDateFormat("dd");
-        date = dateFormat.format(calendar.getTime());
-        if(date.charAt(0) == '0'){
-            date = date.substring(1);
-        }
-        date = "Day " + date;
-        dateTimeDisplay.setText(date);
-        //save edit text
-
-        */
 
         TextView dateTimeDisplay;
         Calendar calendar;
         SimpleDateFormat dateFormat;
         String date;
-        int day;
-        String dayCount;
+        String day;
+        int dayOfYear;
+
         dateTimeDisplay = (TextView) findViewById(R.id.dayIndicator);
         calendar = Calendar.getInstance();
-        dateFormat = new SimpleDateFormat("MMM dd yyyy");
+        dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
         date = dateFormat.format(calendar.getTime());
-        day = calendar.get(Calendar.DAY_OF_YEAR);
-        dayCount = "Day "+ day + "\t" + date;
-        dateTimeDisplay.setText(dayCount);
+        dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+        day = "Day " + dayOfYear + " - " + date;
+        dateTimeDisplay.setText(day);
+
+        SimpleDateFormat dateFormatSave = new SimpleDateFormat("yyyy-MM-dd");
+        String dateSave = dateFormatSave.format(calendar.getTime());
+        String[] arrOfDate = dateSave.split("-");
+        FILE_DIR = File.separator + arrOfDate[0] + File.separator + arrOfDate[1] + File.separator;
+        FILE_NAME += arrOfDate[2] + ".txt";
 
     }
 
-    private static final String FILE_NAME = "text.txt";
+
     public void save(View v) throws IOException {
+        Context context = getApplicationContext();
+        String folder = context.getFilesDir().getAbsolutePath() + FILE_DIR;
+        File subFolder = new File(folder);
+        if(!subFolder.exists()){
+            subFolder.mkdirs();
+        }
+
         EditText dEditText = findViewById(R.id.diary);
         String text = dEditText.getText().toString();
         FileOutputStream fos = null;
-
         try{
-            fos = openFileOutput(FILE_NAME, MODE_PRIVATE);
+            fos = new FileOutputStream(new File(subFolder, FILE_NAME));
             fos.write(text.getBytes());
 
             dEditText.getText().clear();
@@ -107,10 +107,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void load(View v){
+        Context context = getApplicationContext();
+        String folder = context.getFilesDir().getAbsolutePath() + FILE_DIR;
+        File subFolder = new File(folder);
+
         EditText dEditText = findViewById(R.id.diary);
         FileInputStream fis = null;
         try {
-            fis = openFileInput(FILE_NAME);
+            fis = new FileInputStream(new File(subFolder, FILE_NAME));
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
             StringBuilder sb = new StringBuilder();
@@ -137,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void mood(View v){
         setContentView(R.layout.mood_layout);
-
     }
 
     public void create(View v){
@@ -172,12 +175,14 @@ public class MainActivity extends AppCompatActivity {
 
         RecyclerView rvPages = (RecyclerView) findViewById(R.id.diary_list);
         rvPages.setLayoutManager(new LinearLayoutManager(this));
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvPages.getContext(), DividerItemDecoration.VERTICAL);
+        rvPages.addItemDecoration(dividerItemDecoration);
         adapter = new OpenDiaryAdapter(this, diaries);
-        //adapter.setClickListener( this);
+        adapter.setClickListener(this);
         rvPages.setAdapter(adapter);
     }
 
-    public void onitemClick(View view, int position){
+    public void onItemClick(View view, int position){
         Toast.makeText(this, "You clicked " + adapter. getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
     }
 }
