@@ -2,6 +2,9 @@
     <string name="app_name">My Day</string>
     <string name="app_desc">Digital diary for your memories!</string>
     <string name="diary">Type your Diary here!</string>
+    <string name="open_diary">Open Diary</string>
+    <string name="open_desc">Rediscover your own journey</string>
+    <string name="open_s">Open</string>
 
     <string name="create">Write a diary!</string>
     <string name="open">Open Diary</string>
