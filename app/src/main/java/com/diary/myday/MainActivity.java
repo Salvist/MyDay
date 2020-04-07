@@ -25,43 +25,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String FILE_NAME = "text.txt";
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    @SuppressLint("SimpleDateFormat")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-/*
-        TextView dateTimeDisplay;
-        Calendar calendar;
-        SimpleDateFormat dateFormat;
-        String date;
-        dateTimeDisplay = (TextView) findViewById(R.id.dayIndicator);
-        calendar = Calendar.getInstance();
-        dateFormat = new SimpleDateFormat("dd");
-        date = dateFormat.format(calendar.getTime());
-        if(date.charAt(0) == '0'){
-            date = date.substring(1);
-        }
-        date = "Day " + date;
-        dateTimeDisplay.setText(date);
-        //save edit text
-*/
-
-
-        TextView dateTimeDisplay;
-        Calendar calendar;
-        SimpleDateFormat dateFormat;
-        String date;
-        int day;
-        String dayCount;
-        dateTimeDisplay = (TextView) findViewById(R.id.dayIndicator);
-        calendar = Calendar.getInstance();
-        dateFormat = new SimpleDateFormat("dd MMMM yyyy");
-        date = dateFormat.format(calendar.getTime());
-        day = calendar.get(Calendar.DAY_OF_YEAR);
-        dayCount = "Day "+ day + "\t" + date;
-        dateTimeDisplay.setText(dayCount);
 
     }
 
@@ -121,12 +89,52 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void menu(View v){
-        setContentView(R.layout.menu);
+    public void menu(View v) {
+        setContentView(R.layout.activity_main);
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @SuppressLint("SimpleDateFormat")
+    public void create_diary(View v){
+        setContentView(R.layout.create_diary);
+/*
+        TextView dateTimeDisplay;
+        Calendar calendar;
+        SimpleDateFormat dateFormat;
+        String date;
+        dateTimeDisplay = (TextView) findViewById(R.id.dayIndicator);
+        calendar = Calendar.getInstance();
+        dateFormat = new SimpleDateFormat("dd");
+        date = dateFormat.format(calendar.getTime());
+        if(date.charAt(0) == '0'){
+            date = date.substring(1);
+        }
+        date = "Day " + date;
+        dateTimeDisplay.setText(date);
+        //save edit text
+
+        */
+
+        TextView dateTimeDisplay;
+        Calendar calendar;
+        SimpleDateFormat dateFormat;
+        String date;
+        int day;
+        String dayCount;
+        dateTimeDisplay = (TextView) findViewById(R.id.dayIndicator);
+        calendar = Calendar.getInstance();
+        dateFormat = new SimpleDateFormat("MMM dd yyyy");
+        date = dateFormat.format(calendar.getTime());
+        day = calendar.get(Calendar.DAY_OF_YEAR);
+        dayCount = "Day "+ day + "\t" + date;
+        dateTimeDisplay.setText(dayCount);
+
+    }
+
 
     public void mood(View v){
         setContentView(R.layout.mood_layout);
+
     }
 
     public void create(View v){

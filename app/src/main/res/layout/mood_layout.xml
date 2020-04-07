@@ -32,7 +32,7 @@
 
     <Button
         android:id="@+id/happyBtn"
-        android:onClick="create"
+        android:onClick="create_diary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="145dp"
@@ -49,7 +49,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:onClick="create"
+        android:onClick="create_diary"
         android:id="@+id/okayBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
