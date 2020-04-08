@@ -29,23 +29,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.ItemClickListener{
+    private static String FILE_NAME = "diary_";
+    private static String FILE_DIR;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
-
     }
-
 
     public void menu(View v) {
         setContentView(R.layout.activity_main);
     }
-
-    private static String FILE_NAME = "diary_";
-    private static String FILE_DIR;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("SimpleDateFormat")
@@ -71,12 +68,10 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
         String dateSave = dateFormatSave.format(calendar.getTime());
         FILE_DIR = File.separator + dateSave + File.separator;
         FILE_NAME += dayOfYear + ".txt";
-
     }
 
 
     public void save(View v) throws IOException {
-
         Context context = getApplicationContext();
         String folder = context.getFilesDir().getAbsolutePath() + FILE_DIR;
         File subFolder = new File(folder);
@@ -173,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
     OpenDiaryAdapter adapter;
     public void open_diary(View view){
         setContentView(R.layout.open_diary);
-
         Context context = getApplicationContext();
         String folder = context.getFilesDir().getAbsolutePath();
         File subFolder = new File(folder);
