@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OpenDiaryAdapter extends RecyclerView.Adapter<OpenDiaryAdapter.ViewHolder>{
@@ -40,6 +41,7 @@ public class OpenDiaryAdapter extends RecyclerView.Adapter<OpenDiaryAdapter.View
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView textView;
+        String y;
         ViewHolder(View itemView){
             super(itemView);
             textView = itemView.findViewById(R.id.page_date);

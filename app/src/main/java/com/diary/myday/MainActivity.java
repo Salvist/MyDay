@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.ItemClickListener{
 
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
 
     private static String FILE_NAME = "diary_";
     private static String FILE_DIR;
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("SimpleDateFormat")
     public void create_diary(View v){
@@ -65,16 +67,16 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
         day = "Day " + dayOfYear + " - " + date;
         dateTimeDisplay.setText(day);
 
-        SimpleDateFormat dateFormatSave = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat dateFormatSave = new SimpleDateFormat("yyyy");
         String dateSave = dateFormatSave.format(calendar.getTime());
-        String[] arrOfDate = dateSave.split("-");
-        FILE_DIR = File.separator + arrOfDate[0] + File.separator + arrOfDate[1] + File.separator;
-        FILE_NAME += arrOfDate[2] + ".txt";
+        FILE_DIR = File.separator + dateSave + File.separator;
+        FILE_NAME += dayOfYear + ".txt";
 
     }
 
 
     public void save(View v) throws IOException {
+
         Context context = getApplicationContext();
         String folder = context.getFilesDir().getAbsolutePath() + FILE_DIR;
         File subFolder = new File(folder);
@@ -106,15 +108,18 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
         }
     }
 
-    public void load(View v){
+    public void load(View v, String d){
+        setContentView(R.layout.load_diary);
         Context context = getApplicationContext();
         String folder = context.getFilesDir().getAbsolutePath() + FILE_DIR;
         File subFolder = new File(folder);
 
-        EditText dEditText = findViewById(R.id.diary);
+        TextView dayLoad = findViewById(R.id.load_day);
+        dayLoad.setText(d);
+        TextView dTextView = findViewById(R.id.load_diary);
         FileInputStream fis = null;
         try {
-            fis = new FileInputStream(new File(subFolder, FILE_NAME));
+            fis = new FileInputStream(new File(subFolder, d));
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
             StringBuilder sb = new StringBuilder();
@@ -123,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
             while ((text = br.readLine()) != null){
                 sb.append(text).append("\n");
             }
-            dEditText.setText(sb.toString());
+            dTextView.setText(sb.toString());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -153,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
         //reward a smiley sticker
     }
 
-
     public void okay(View view){
         //  Button okayBtn = (Button) findViewById(R.id.okayBtn);
         setContentView(R.layout.activity_main);
@@ -165,24 +169,52 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
         //go into minigame
     }
 
+    ArrayList<String> listDiary = new ArrayList<>();
     OpenDiaryAdapter adapter;
     public void open_diary(View view){
         setContentView(R.layout.open_diary);
 
-        ArrayList<String> diaries = new ArrayList<>();
-        diaries.add("diary 1");
-        diaries.add("diary 2");
+        Context context = getApplicationContext();
+        String folder = context.getFilesDir().getAbsolutePath();
+        File subFolder = new File(folder);
+        File[] list = subFolder.listFiles();
+
+        for(File f: list){
+            String name = f.getName();
+            listDiary.add(name);
+        }
+        Collections.sort(listDiary);
 
         RecyclerView rvPages = (RecyclerView) findViewById(R.id.diary_list);
-        rvPages.setLayoutManager(new LinearLayoutManager(this));
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvPages.getContext(), DividerItemDecoration.VERTICAL);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        rvPages.setLayoutManager(layoutManager);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvPages.getContext(), layoutManager.getOrientation());
         rvPages.addItemDecoration(dividerItemDecoration);
-        adapter = new OpenDiaryAdapter(this, diaries);
+        adapter = new OpenDiaryAdapter(this, listDiary);
         adapter.setClickListener(this);
         rvPages.setAdapter(adapter);
     }
 
+    @Override
     public void onItemClick(View view, int position){
         Toast.makeText(this, "You clicked " + adapter. getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
+
+        if(listDiary.get(position).endsWith(".txt")){
+            load(view, listDiary.get(position));
+            listDiary.clear();
+            return;
+        }
+        FILE_DIR = File.separator + listDiary.get(position);
+        Context context = getApplicationContext();
+        String folder = context.getFilesDir().getAbsolutePath() + FILE_DIR;
+        File subFolder = new File(folder);
+        File[] list = subFolder.listFiles();
+
+        listDiary.clear();
+        for(File f: list){
+            String name = f.getName();
+            listDiary.add(name);
+        }
+        adapter.notifyDataSetChanged();
     }
 }

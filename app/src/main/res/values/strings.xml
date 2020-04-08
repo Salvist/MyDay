@@ -10,6 +10,8 @@
     <string name="open">Open Diary</string>
     <string name="setting">Settings</string>
 
+    <string name="load_d">Loading diary . . .</string>
+
     <string name="save">Save Diary!</string>
     <string name="load">Load</string>
     <string name="question">How do you feel today?</string>
