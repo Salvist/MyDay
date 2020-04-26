@@ -2,12 +2,14 @@ package com.diary.myday;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.icu.util.Calendar;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,29 +49,9 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
     @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("SimpleDateFormat")
     public void create_diary(View v){
-        setContentView(R.layout.create_diary);
-
-        TextView dateTimeDisplay;
-        Calendar calendar;
-        SimpleDateFormat dateFormat;
-        String date;
-        String day;
-        int dayOfYear;
-
-        dateTimeDisplay = (TextView) findViewById(R.id.dayIndicator);
-        calendar = Calendar.getInstance();
-        dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
-        date = dateFormat.format(calendar.getTime());
-        dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-        day = "Day " + dayOfYear + " - " + date;
-        dateTimeDisplay.setText(day);
-
-        SimpleDateFormat dateFormatSave = new SimpleDateFormat("yyyy");
-        String dateSave = dateFormatSave.format(calendar.getTime());
-        FILE_DIR = File.separator + dateSave + File.separator;
-        FILE_NAME += dayOfYear + ".txt";
+        Intent createDiaryIntent = new Intent(this, CreateDiary.class);
+        startActivity(createDiaryIntent);
     }
-
 
     public void save(View v) throws IOException {
         Context context = getApplicationContext();
@@ -137,31 +119,6 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
                 }
             }
         }
-    }
-
-    public void mood(View v){
-        setContentView(R.layout.mood_layout);
-    }
-
-    public void create(View v){
-        setContentView(R.layout.activity_main);
-    }
-
-        public void happy(View view){
-        Button happyBtn = (Button) findViewById(R.id.happyBtn);
-            setContentView(R.layout.activity_main);
-        //reward a smiley sticker
-    }
-
-    public void okay(View view){
-        //  Button okayBtn = (Button) findViewById(R.id.okayBtn);
-        setContentView(R.layout.activity_main);
-        //go into the diary box page
-    }
-
-    public void sad(View view){
-        Button sadBtn = (Button) findViewById(R.id.sadBtn);
-        //go into minigame
     }
 
     ArrayList<String> listDiary = new ArrayList<>();

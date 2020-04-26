@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="128dp"
         android:text="@string/create"
-        android:onClick="mood"
+        android:onClick="create_diary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
