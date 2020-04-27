@@ -1,23 +1,21 @@
 package com.diary.myday;
 
-import android.annotation.SuppressLint;
-import android.app.ActionBar;
+import android.content.ClipData;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.Drawable;
 import android.icu.util.Calendar;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.DragEvent;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,20 +23,27 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 
-public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
+public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener, StickersAdapter.ItemClickListener {
     private static String FILE_NAME = "diary_";
     private static String FILE_DIR;
+    private ConstraintLayout createLayout;
+    private DisplayMetrics displayMetrics;
 
+    private int xDelta;
+    private int yDelta;
+    private int screenWidth;
+    private int screenHeight;
 
     @Override
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -46,13 +51,21 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.mood_layout);
-
+        displayMetrics = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        screenWidth = displayMetrics.widthPixels;
+        screenHeight = displayMetrics.heightPixels;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void create_diary(View v){
         setContentView(R.layout.create_diary);
 
+        getDay();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void getDay(){
         TextView dateTimeDisplay;
         Calendar calendar;
         SimpleDateFormat dateFormat;
@@ -120,12 +133,22 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
         });
     }
 
+    StickersAdapter adapter;
+    int[] images = {R.drawable.duck, R.drawable.cup_of_coffee, R.drawable.porcu_boba};
     @Override
-    public boolean onMenuItemClick(MenuItem menuItem) {
+    public boolean onMenuItemClick(MenuItem menuItem){
         switch(menuItem.getItemId()){
             case R.id.add_stickers:
-                return true;
+                setContentView(R.layout.sticker_list);
 
+                RecyclerView rvStickers = (RecyclerView) findViewById(R.id.sticker_list);
+                GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+                rvStickers.setHasFixedSize(true);
+                rvStickers.setLayoutManager(layoutManager);
+                adapter = new StickersAdapter(this, images);
+                adapter.setClickListener(this);
+                rvStickers.setAdapter(adapter);
+                return true;
             default:
                 return false;
         }
@@ -133,19 +156,94 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
     }
 
     public void menu(View view){
-        ConstraintLayout layout = (ConstraintLayout)  findViewById(R.id.create_diary);
-        ImageView image = new ImageView(CreateDiary.this);
-        image.setImageResource(R.drawable.porcu_boba);
-        image.setAdjustViewBounds(true);
-        image.setMaxWidth(150);
-        image.setMaxHeight(150);
-        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        layout.addView(image, params);
-        //finish();
+        finish();
     }
     public void onClick(View v){
 
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    //@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Override
+    public void onItemClick(View view, int position) {
+        //Toast.makeText(this, "You clicked " + adapter.getItemCount() + " on row number " + position, Toast.LENGTH_SHORT).show();
+        setContentView(R.layout.create_diary);
+        getDay();
+        //ConstraintLayout layout = (ConstraintLayout)  findViewById(R.id.create_diary);
+        createLayout = findViewById(R.id.create_diary);
+        ConstraintSet set = new ConstraintSet();
+        set.clone(createLayout);
+
+        ImageView image = new ImageView(CreateDiary.this);
+        image.setId(ImageView.generateViewId());
+        image.setImageResource(adapter.getItem(position));
+        image.setMaxWidth(256);
+        image.setAdjustViewBounds(true);
+
+        image.setOnTouchListener(new touchListener());
+
+        createLayout.addView(image);
+
+        set.constrainHeight(image.getId(), ConstraintSet.WRAP_CONTENT);
+        set.constrainWidth(image.getId(), ConstraintSet.WRAP_CONTENT);
+        set.connect(image.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
+        set.connect(image.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0);
+        set.connect(image.getId(), ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, 0);
+        set.connect(image.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0);
+
+        set.applyTo(createLayout);
+    }
+
+    private final class touchListener implements View.OnTouchListener{
+        public boolean onTouch(View view, MotionEvent e) {
+            int width = createLayout.getLayoutParams().width;
+            int height = createLayout.getLayoutParams().height;
+
+            switch(e.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    xDelta = (int) (view.getX() - e.getRawX());
+                    yDelta = (int) (view.getY() - e.getRawY());
+                    return true;
+
+                case MotionEvent.ACTION_MOVE:
+                    if (width == screenWidth && height == screenHeight){}
+                    else {
+                        view.animate()
+                                .x(e.getRawX() + xDelta)
+                                .y(e.getRawY() + yDelta)
+                                .setDuration(0)
+                                .start();
+
+                        if (e.getRawX() + xDelta + width > screenWidth) {
+                            view.animate()
+                                    .x(screenWidth - width)
+                                    .setDuration(0)
+                                    .start();
+                        }
+                        if (e.getRawX() + xDelta < 0) {
+                            view.animate()
+                                    .x(0)
+                                    .setDuration(0)
+                                    .start();
+                        }
+                        if (e.getRawY() + yDelta + height > screenHeight) {
+                            view.animate()
+                                    .y(screenHeight - height)
+                                    .setDuration(0)
+                                    .start();
+                        }
+                        if (e.getRawY() + yDelta < 0) {
+                            view.animate()
+                                    .y(0)
+                                    .setDuration(0)
+                                    .start();
+                        }
+
+                        return true;
+                    }
+            }
+
+            return true;
+        }
     }
 }

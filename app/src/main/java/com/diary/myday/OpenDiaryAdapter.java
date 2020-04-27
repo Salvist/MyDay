@@ -2,6 +2,7 @@ package com.diary.myday;
 
 import android.content.Context;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OpenDiaryAdapter extends RecyclerView.Adapter<OpenDiaryAdapter.ViewHolder>{
@@ -16,6 +18,7 @@ public class OpenDiaryAdapter extends RecyclerView.Adapter<OpenDiaryAdapter.View
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
+    //string rv
     OpenDiaryAdapter(Context context, List<String> data){
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
@@ -23,7 +26,7 @@ public class OpenDiaryAdapter extends RecyclerView.Adapter<OpenDiaryAdapter.View
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.diary_pages, parent, false);
+        View view = mInflater.inflate(R.layout.diary_pages, parent, true);
         return new ViewHolder(view);
     }
 
@@ -40,7 +43,6 @@ public class OpenDiaryAdapter extends RecyclerView.Adapter<OpenDiaryAdapter.View
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView textView;
-        String y;
         ViewHolder(View itemView){
             super(itemView);
             textView = itemView.findViewById(R.id.page_date);
