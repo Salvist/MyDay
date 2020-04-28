@@ -2,6 +2,7 @@ package com.diary.myday;
 
 import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.icu.util.Calendar;
 import android.os.Build;
@@ -34,7 +35,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
-public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener, StickersAdapter.ItemClickListener {
+public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener{
     private static String FILE_NAME = "diary_";
     private static String FILE_DIR;
     private ConstraintLayout createLayout;
@@ -44,6 +45,8 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
     private int yDelta;
     private int screenWidth;
     private int screenHeight;
+
+    public static final int SELECT_STICKER_RC = 1;
 
     @Override
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -119,6 +122,9 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
         }
     }
 
+    public void menu(View view){
+        finish();
+    }
 
     public void option(View view) {
         Button btn_popup = (Button) findViewById(R.id.option);
@@ -139,59 +145,45 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
     public boolean onMenuItemClick(MenuItem menuItem){
         switch(menuItem.getItemId()){
             case R.id.add_stickers:
-                setContentView(R.layout.sticker_list);
-
-                RecyclerView rvStickers = (RecyclerView) findViewById(R.id.sticker_list);
-                GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
-                rvStickers.setHasFixedSize(true);
-                rvStickers.setLayoutManager(layoutManager);
-                adapter = new StickersAdapter(this, images);
-                adapter.setClickListener(this);
-                rvStickers.setAdapter(adapter);
+                Intent addStickerIntent = new Intent(this, AddSticker.class);
+                startActivityForResult(addStickerIntent, SELECT_STICKER_RC);
                 return true;
             default:
                 return false;
         }
-
-    }
-
-    public void menu(View view){
-        finish();
-    }
-    public void onClick(View v){
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    //@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
-    public void onItemClick(View view, int position) {
-        //Toast.makeText(this, "You clicked " + adapter.getItemCount() + " on row number " + position, Toast.LENGTH_SHORT).show();
-        setContentView(R.layout.create_diary);
-        getDay();
-        //ConstraintLayout layout = (ConstraintLayout)  findViewById(R.id.create_diary);
-        createLayout = findViewById(R.id.create_diary);
-        ConstraintSet set = new ConstraintSet();
-        set.clone(createLayout);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == SELECT_STICKER_RC){
+            int stickerId = data.getIntExtra("STICKER_ID", 0);
+            if(stickerId != 0) {
+                createLayout = findViewById(R.id.create_diary);
+                ConstraintSet set = new ConstraintSet();
+                set.clone(createLayout);
 
-        ImageView image = new ImageView(CreateDiary.this);
-        image.setId(ImageView.generateViewId());
-        image.setImageResource(adapter.getItem(position));
-        image.setMaxWidth(256);
-        image.setAdjustViewBounds(true);
+                ImageView image = new ImageView(CreateDiary.this);
+                image.setId(ImageView.generateViewId());
+                image.setImageResource(stickerId);
+                image.setMaxWidth(256);
+                image.setAdjustViewBounds(true);
 
-        image.setOnTouchListener(new touchListener());
+                image.setOnTouchListener(new touchListener());
 
-        createLayout.addView(image);
+                createLayout.addView(image);
 
-        set.constrainHeight(image.getId(), ConstraintSet.WRAP_CONTENT);
-        set.constrainWidth(image.getId(), ConstraintSet.WRAP_CONTENT);
-        set.connect(image.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
-        set.connect(image.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0);
-        set.connect(image.getId(), ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, 0);
-        set.connect(image.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0);
+                set.constrainHeight(image.getId(), ConstraintSet.WRAP_CONTENT);
+                set.constrainWidth(image.getId(), ConstraintSet.WRAP_CONTENT);
+                set.connect(image.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
+                set.connect(image.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0);
+                set.connect(image.getId(), ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, 0);
+                set.connect(image.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0);
 
-        set.applyTo(createLayout);
+                set.applyTo(createLayout);
+            }
+        }
     }
 
     private final class touchListener implements View.OnTouchListener{

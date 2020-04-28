@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".CreateDiary" />
+        <activity android:name=".AddSticker" />
 
         <meta-data
             android:name="preloaded_fonts"
