@@ -9,12 +9,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,38 +57,7 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
         startActivity(createDiaryIntent);
     }
 
-    public void save(View v) throws IOException {
-        Context context = getApplicationContext();
-        String folder = context.getFilesDir().getAbsolutePath() + FILE_DIR;
-        File subFolder = new File(folder);
-        if(!subFolder.exists()){
-            subFolder.mkdirs();
-        }
-
-        EditText dEditText = findViewById(R.id.diary);
-        String text = dEditText.getText().toString();
-        FileOutputStream fos = null;
-        try{
-            fos = new FileOutputStream(new File(subFolder, FILE_NAME));
-            fos.write(text.getBytes());
-
-            dEditText.getText().clear();
-            Toast.makeText(getApplicationContext(), "Diary is saved!", Toast.LENGTH_LONG).show();
-        } catch(FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e){
-            e.printStackTrace();
-        } finally {
-            if(fos != null){
-                try {
-                    fos.close();
-                } catch (IOException e){
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void load(View v, String d){
         setContentView(R.layout.load_diary);
         Context context = getApplicationContext();
@@ -92,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
         File subFolder = new File(folder);
 
         TextView dayLoad = findViewById(R.id.load_day);
-        dayLoad.setText(d);
         TextView dTextView = findViewById(R.id.load_diary);
         FileInputStream fis = null;
         try {
@@ -100,11 +72,33 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
             StringBuilder sb = new StringBuilder();
-            String text;
 
+            String text;
+            String day = "";
+            int stickerIdLoad[] = {0, 0, 0};
+            Boolean message = false;
+            int[][] stickerPosLoad = new int[3][2];
+
+            int c = 0;
             while ((text = br.readLine()) != null){
-                sb.append(text).append("\n");
+                if(message == false) {
+                    if (text.startsWith("Date: ")) day = text.substring(6);
+                    if (text.startsWith("StickerId: ") && Integer.parseInt(text.substring(11)) == c+1) continue;
+                    if (text.startsWith("StickerId: ")) c++;
+                    if (text.startsWith("StickerRes: ")) stickerIdLoad[c] = Integer.parseInt(text.substring(12));
+                    if (text.startsWith("StickerPosX: ")) stickerPosLoad[c][0] = Integer.parseInt(text.substring(13));
+                    if (text.startsWith("StickerPosY: ")) stickerPosLoad[c][1] = Integer.parseInt(text.substring(13));
+                    if (text.startsWith("Message: ")) message = true;
+                } else {
+                    sb.append(text).append("\n");
+                }
             }
+            dayLoad.setText(day);
+
+            for(int i = 0; i < 3; ++i){
+                if(stickerIdLoad[i] != 0) loadSticker(stickerIdLoad[i], stickerPosLoad[i]);
+            }
+
             dTextView.setText(sb.toString());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -119,6 +113,30 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
                 }
             }
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void loadSticker(int stickerIdLoad, int[] stickerPosLoad){
+        ConstraintLayout loadLayout = findViewById(R.id.load_page);
+        ConstraintSet set = new ConstraintSet();
+        int HEIGHT_FIXER = 210;
+        stickerPosLoad[1] -= HEIGHT_FIXER;
+
+        set.clone(loadLayout);
+
+        ImageView image = new ImageView(MainActivity.this);
+        image.setId(ImageView.generateViewId());
+        image.setImageResource(stickerIdLoad);
+        image.setMaxWidth(256);
+        image.setAdjustViewBounds(true);
+        loadLayout.addView(image);
+
+        set.constrainHeight(image.getId(), ConstraintSet.WRAP_CONTENT);
+        set.constrainWidth(image.getId(), ConstraintSet.WRAP_CONTENT);
+        set.connect(image.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
+        set.setTranslation(image.getId(), stickerPosLoad[0], stickerPosLoad[1]);
+
+        set.applyTo(loadLayout);
     }
 
     ArrayList<String> listDiary = new ArrayList<>();
@@ -146,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
         rvPages.setAdapter(adapter);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onItemClick(View view, int position){
         Toast.makeText(this, "You clicked " + adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();

@@ -26,7 +26,7 @@ public class OpenDiaryAdapter extends RecyclerView.Adapter<OpenDiaryAdapter.View
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.diary_pages, parent, true);
+        View view = mInflater.inflate(R.layout.diary_pages, parent, false);
         return new ViewHolder(view);
     }
 
