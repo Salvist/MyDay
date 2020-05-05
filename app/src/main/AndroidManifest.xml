@@ -20,6 +20,7 @@
         <activity android:name=".AddSticker" />
         <activity android:name=".ArrangePictureGame" />
         <activity android:name=".PuzzlePiece" />
+        <activity android:name=".TicTacToe" />
 
         <meta-data
             android:name="preloaded_fonts"

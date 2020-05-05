@@ -1,5 +1,7 @@
 package com.diary.myday;
 
+import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
@@ -12,13 +14,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -30,6 +38,7 @@ public class ArrangePictureGame extends AppCompatActivity {
     ConstraintLayout gameLayout;
     RelativeLayout relLayout;
 
+    TextView finish;
     ArrayList<PuzzlePiece> pieces;
 
 
@@ -43,11 +52,15 @@ public class ArrangePictureGame extends AppCompatActivity {
         screenWidth = displayMetrics.widthPixels;
         screenHeight = displayMetrics.heightPixels;
 
+        checkSettings();
         puzzleGame();
 
     }
 
     public void puzzleGame(){
+        finish = findViewById(R.id.arrange_finish_text);
+        finish.setText("Arrange the puzzle!");
+
         gameLayout = findViewById(R.id.arrange_game);
         relLayout = findViewById(R.id.layout);
         final ConstraintSet set = new ConstraintSet();
@@ -217,7 +230,7 @@ public class ArrangePictureGame extends AppCompatActivity {
 
     public void checkGameOver() {
         if (isGameOver()) {
-            finish();
+            finish.setText("You finished the puzzle!");
         }
     }
 
@@ -229,5 +242,55 @@ public class ArrangePictureGame extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    public void close(View v){
+        finish();
+    }
+
+    public void checkSettings(){
+        Context context = getApplicationContext();
+        String folder = context.getFilesDir().getAbsolutePath();
+        File subFolder = new File(folder);
+        File[] list = subFolder.listFiles();
+
+        FileInputStream fis = null;
+        for(File f: list){
+            if(f.getName().contains("settings.txt")) {
+                System.out.println("settings.txt found");
+                try {
+                    fis = new FileInputStream(new File(subFolder, f.getName()));
+                    InputStreamReader isr = new InputStreamReader(fis);
+                    BufferedReader br = new BufferedReader(isr);
+
+                    String text;
+                    while ((text = br.readLine()) != null){
+                        if (text.startsWith("Background: ")) applySettings(text.substring(12));
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return;
+            }
+        }
+    }
+
+    public void applySettings(String color){
+        View current = this.findViewById(android.R.id.content);
+        System.out.println("applying color: " + color);
+        String[] colorNames = getResources().getStringArray(R.array.colorNames);
+        for(int i=0; i<colorNames.length; i++)
+        {
+            //Getting the color resource id
+            TypedArray ta = getResources().obtainTypedArray(R.array.colors);
+            int colorToUse = ta.getResourceId(i, 0);
+
+            if(color.contains(colorNames[i])) {
+                current.setBackgroundResource(colorToUse);
+                System.out.println(colorToUse);
+            }
+        }
     }
 }

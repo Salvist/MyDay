@@ -1,7 +1,9 @@
 package com.diary.myday;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
@@ -25,12 +27,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener{
     private static String FILE_NAME;
@@ -74,38 +80,44 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
         stickerResSave = new int[stickerMax];
         stickerPosSave = new int[stickerMax][2];
 
+        checkSettings();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void create_diary(View v){
         setContentView(R.layout.create_diary);
-
+        checkSettings();
         getDay();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void sad(View v){
         setContentView(R.layout.create_diary);
-
         getDay();
-        Intent arrangeIntent = new Intent(this, ArrangePictureGame.class);
-        startActivity(arrangeIntent);
+
+        Random rand = new Random();
+        int random_game = rand.nextInt(2);
+        if(random_game == 0){
+            Intent gameIntent = new Intent(this, TicTacToe.class);
+            startActivity(gameIntent);
+        }
+        if(random_game == 1){
+            Intent gameIntent = new Intent(this, ArrangePictureGame.class);
+            startActivity(gameIntent);
+        }
     }
-
-
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void getDay(){
         TextView dateTimeDisplay;
         Calendar calendar;
         SimpleDateFormat dateFormat;
-        //String date;
-        //String day;
+
         int dayOfYear;
 
-        dateTimeDisplay = (TextView) findViewById(R.id.dayIndicator);
+        dateTimeDisplay = findViewById(R.id.dayIndicator);
         calendar = Calendar.getInstance();
-        dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
+        dateFormat = new SimpleDateFormat("MMMMM dd, yyyy");
         date = dateFormat.format(calendar.getTime());
         dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
         day = "Day " + dayOfYear + " - " + date;
@@ -315,6 +327,52 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
                     }
             }
             return true;
+        }
+    }
+
+    public void checkSettings(){
+        Context context = getApplicationContext();
+        String folder = context.getFilesDir().getAbsolutePath();
+        File subFolder = new File(folder);
+        File[] list = subFolder.listFiles();
+
+        FileInputStream fis = null;
+        for(File f: list){
+            if(f.getName().contains("settings.txt")) {
+                System.out.println("settings.txt found");
+                try {
+                    fis = new FileInputStream(new File(subFolder, f.getName()));
+                    InputStreamReader isr = new InputStreamReader(fis);
+                    BufferedReader br = new BufferedReader(isr);
+
+                    String text;
+                    while ((text = br.readLine()) != null){
+                        if (text.startsWith("Background: ")) applySettings(text.substring(12));
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return;
+            }
+        }
+    }
+
+    public void applySettings(String color){
+        View current = this.findViewById(android.R.id.content);
+        System.out.println("applying color: " + color);
+        String[] colorNames = getResources().getStringArray(R.array.colorNames);
+        for(int i=0; i<colorNames.length; i++)
+        {
+            //Getting the color resource id
+            TypedArray ta = getResources().obtainTypedArray(R.array.colors);
+            int colorToUse = ta.getResourceId(i, 0);
+
+            if(color.contains(colorNames[i])) {
+                current.setBackgroundResource(colorToUse);
+                System.out.println(colorToUse);
+            }
         }
     }
 }

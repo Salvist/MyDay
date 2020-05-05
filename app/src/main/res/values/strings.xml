@@ -5,15 +5,27 @@
     <string name="open_diary">Open Diary</string>
     <string name="open_desc">Rediscover your own journey</string>
     <string name="open_s">Open</string>
+    <string name="close">Close</string>
 
     <string name="menu">Menu</string>
     <string name="create">Write a diary!</string>
     <string name="open">Open Diary</string>
-    <string name="setting">Settings</string>
+
     <string name="option">Option</string>
     <string name="add_sticker">Add Sticker</string>
 
     <string name="load_d">Loading diary . . .</string>
+
+    <string name="setting">Settings</string>
+    <string name="bg">Background:</string>
+    <string name="bg_color">Color</string>
+    <string name="change">Change</string>
+    <string name="minigames">Mini games</string>
+    <string name="arrange_puzzle">Arrange Puzzle!</string>
+    <string name="arrange_finish">You finished the puzzle!</string>
+    <string name="ttt">Tic Tac Toe!</string>
+    <string name="xo">X/O</string>
+    <string name="condition">You won!</string>
 
     <string name="save">Save Diary!</string>
     <string name="load">Load</string>
