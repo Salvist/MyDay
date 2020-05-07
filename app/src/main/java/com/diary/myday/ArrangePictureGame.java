@@ -36,7 +36,6 @@ public class ArrangePictureGame extends AppCompatActivity {
     private int screenWidth;
     private int screenHeight;
     ConstraintLayout gameLayout;
-    RelativeLayout relLayout;
 
     TextView finish;
     ArrayList<PuzzlePiece> pieces;
@@ -62,7 +61,6 @@ public class ArrangePictureGame extends AppCompatActivity {
         finish.setText("Arrange the puzzle!");
 
         gameLayout = findViewById(R.id.arrange_game);
-        relLayout = findViewById(R.id.layout);
         final ConstraintSet set = new ConstraintSet();
         set.clone(gameLayout);
 
@@ -72,16 +70,21 @@ public class ArrangePictureGame extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
             @Override
             public void run(){
-                relLayout = findViewById(R.id.layout);
+                //relLayout = findViewById(R.id.layout);
+                gameLayout = findViewById(R.id.arrange_game);
                 pieces = splitImage(picture);
                 Collections.shuffle(pieces);
                 for(PuzzlePiece piece : pieces){
-                    piece.setOnTouchListener(new TouchListener(ArrangePictureGame.this));
-                    relLayout.addView(piece);
-                    RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) piece.getLayoutParams();
-                    lParams.leftMargin = new Random().nextInt(relLayout.getWidth() - piece.width);
-                    lParams.topMargin = new Random().nextInt(relLayout.getHeight() - piece.height);
-                    piece.setLayoutParams(lParams);
+                    piece.setId(ImageView.generateViewId());
+                    piece.setOnTouchListener(new touchListener(ArrangePictureGame.this));
+                    gameLayout.addView(piece);
+
+                    set.constrainHeight(piece.getId(), ConstraintSet.WRAP_CONTENT);
+                    set.constrainWidth(piece.getId(), ConstraintSet.WRAP_CONTENT);
+                    set.setTranslationX(piece.getId(), new Random().nextInt(gameLayout.getWidth() - piece.width));
+                    set.setTranslationY(piece.getId(), new Random().nextInt(gameLayout.getHeight() - piece.height));
+                    set.applyTo(gameLayout);
+
                 }
             }
         });
@@ -157,8 +160,8 @@ public class ArrangePictureGame extends AppCompatActivity {
         int pictureH = picture.getHeight() - actH;
         System.out.println(picture.getWidth() + " " + picture.getHeight());
 
-        int top = (int) pictureH / 2;
-        int left = (int) pictureW / 2;
+        int top = pictureH / 2;
+        int left = pictureW / 2;
 
         ret[0] = left;
         ret[1] = top;
@@ -166,6 +169,7 @@ public class ArrangePictureGame extends AppCompatActivity {
         return ret;
     }
 
+    /*
     public class TouchListener implements View.OnTouchListener{
         private float xDelta;
         private float yDelta;
@@ -215,6 +219,102 @@ public class ArrangePictureGame extends AppCompatActivity {
                         activity.checkGameOver();
                     }
                     break;
+            }
+            return true;
+        }
+    }
+    */
+
+    private final class touchListener implements View.OnTouchListener{
+        ArrangePictureGame activity;
+        public touchListener(ArrangePictureGame activity) {
+            this.activity = activity;
+        }
+
+
+        int xDelta;
+        int yDelta;
+        int xDelta2;
+        int yDelta2;
+
+        public boolean onTouch(View view, MotionEvent e) {
+            int width = view.getWidth();
+            int height = view.getHeight() + 210;    //HEIGHT_FIXER = 210
+
+            PuzzlePiece piece = (PuzzlePiece) view;
+            if (!piece.move) {
+                return true;
+            }
+
+            final double tolerance = Math.sqrt(Math.pow(view.getWidth(), 2) + Math.pow(view.getHeight(), 2)) / 5;
+
+            switch(e.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    System.out.println("Action was DOWN");
+                    xDelta = (int) (view.getX() - e.getRawX());
+                    yDelta = (int) (view.getY() - e.getRawY());
+                    xDelta2 = view.getRight();
+                    yDelta2 = view.getBottom();
+
+                    piece.bringToFront();
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    System.out.println("Action was UP");
+                    int xDiff = (int) Math.abs(piece.xCoord - view.getX());
+                    int yDiff = (int) Math.abs(piece.yCoord - view.getY());
+                    System.out.println("xDiff = " + xDiff + ", yDiff = " + yDiff);
+                    System.out.println("piece.xCoord =" + piece.xCoord + ", piece.yCoord =" + piece.yCoord);
+                    if (xDiff <= tolerance && yDiff <= tolerance) {
+                        System.out.println("SNAP!");
+                        view.animate()
+                                .x(piece.xCoord)
+                                .y(piece.yCoord)
+                                .setDuration(0)
+                                .start();
+
+                        piece.move = false;
+                        sendViewToBack(piece);
+                        activity.checkGameOver();
+                    }
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    if (width == screenWidth && height == screenHeight){}
+                    else {
+                        view.animate()
+                                .x(e.getRawX() + xDelta)
+                                .y(e.getRawY() + yDelta)
+                                .setDuration(0)
+                                .start();
+
+                        if (e.getRawX() + xDelta + width > screenWidth) {
+                            System.out.println("boundary right x");
+                            view.animate()
+                                    .x(screenWidth - width)
+                                    .setDuration(0)
+                                    .start();
+                        }
+                        if (e.getRawX() + xDelta < 0) {
+                            view.animate()
+                                    .x(0)
+                                    .setDuration(0)
+                                    .start();
+                        }
+                        if (e.getRawY() + yDelta + height > screenHeight) {
+                            view.animate()
+                                    .y(screenHeight - height)
+                                    .setDuration(0)
+                                    .start();
+                        }
+                        if (e.getRawY() + yDelta < 0) {
+                            System.out.println("boundary upper y ");
+                            view.animate()
+                                    .y(0)
+                                    .setDuration(0)
+                                    .start();
+                        }
+
+                        return true;
+                    }
             }
             return true;
         }

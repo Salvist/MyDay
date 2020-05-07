@@ -221,6 +221,10 @@ public class MainActivity extends AppCompatActivity implements OpenDiaryAdapter.
         }
     }
 
+    public void close(View v){
+        setContentView(R.layout.activity_main);
+    }
+
     public void checkSettings(){
         Context context = getApplicationContext();
         String folder = context.getFilesDir().getAbsolutePath();
