@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/add_stickers"
         android:title="Add stickers"/>
-    <item android:id="@+id/change_frame"
-        android:title="Change Frame"/>
+    <item android:id="@+id/change_font"
+        android:title="Change Font"/>
 
 </menu>

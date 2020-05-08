@@ -10,17 +10,28 @@
     <string name="menu">Menu</string>
     <string name="create">Write a diary!</string>
     <string name="open">Open Diary</string>
+    <string name="back">Back</string>
 
     <string name="option">Option</string>
     <string name="add_sticker">Add Sticker</string>
+    <string name="font">Change Font</string>
+    <string name="beathy">Beathy</string>
+    <string name="fruity_stories">Fruity Stories</string>
+    <string name="sweet_purple">sweet purple</string>
+    <string name="sweety_rasty">Sweety Rasty</string>
+    <string name="thyssen">Thyssen J</string>
+    <string name="typewr">TYPEWR</string>
 
     <string name="load_d">Loading diary . . .</string>
+    <string name="edit_d">Edit</string>
 
     <string name="setting">Settings</string>
     <string name="bg">Background:</string>
     <string name="bg_color">Color</string>
     <string name="change">Change</string>
-    <string name="minigames">Mini games</string>
+    <string name="minigames">Minigames</string>
+    <string name="play">Play</string>
+
     <string name="arrange_puzzle">Arrange Puzzle!</string>
     <string name="arrange_finish">You finished the puzzle!</string>
     <string name="ttt">Tic Tac Toe!</string>
@@ -33,4 +44,6 @@
     <string name="happy">HAPPY</string>
     <string name="okay">OKAY</string>
     <string name="sad">SAD</string>
+
+    <string name="font_grand_hotel">grand_hotel</string>
 </resources>

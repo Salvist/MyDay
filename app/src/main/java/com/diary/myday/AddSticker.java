@@ -19,7 +19,7 @@ public class AddSticker extends AppCompatActivity implements  StickersAdapter.It
 
         setContentView(R.layout.sticker_list);
 
-        RecyclerView rvStickers = (RecyclerView) findViewById(R.id.sticker_list);
+        RecyclerView rvStickers = findViewById(R.id.sticker_list);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         rvStickers.setHasFixedSize(true);
         rvStickers.setLayoutManager(layoutManager);

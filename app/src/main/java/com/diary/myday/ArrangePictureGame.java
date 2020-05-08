@@ -44,6 +44,7 @@ public class ArrangePictureGame extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.arrange_game);
 
         displayMetrics = new DisplayMetrics();
@@ -66,6 +67,11 @@ public class ArrangePictureGame extends AppCompatActivity {
 
         final ImageView picture = findViewById(R.id.picture);
 
+
+        System.out.println("Max Width: " + picture.getMaxWidth() +
+                            "\nwidth: " + picture.getWidth() +
+                            "\nMax width/3: " + picture.getMaxWidth()/3);
+
         picture.post(new Runnable(){
             @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
             @Override
@@ -77,10 +83,11 @@ public class ArrangePictureGame extends AppCompatActivity {
                 for(PuzzlePiece piece : pieces){
                     piece.setId(ImageView.generateViewId());
                     piece.setOnTouchListener(new touchListener(ArrangePictureGame.this));
+
                     gameLayout.addView(piece);
 
-                    set.constrainHeight(piece.getId(), ConstraintSet.WRAP_CONTENT);
                     set.constrainWidth(piece.getId(), ConstraintSet.WRAP_CONTENT);
+                    set.constrainHeight(piece.getId(), ConstraintSet.WRAP_CONTENT);
                     set.setTranslationX(piece.getId(), new Random().nextInt(gameLayout.getWidth() - piece.width));
                     set.setTranslationY(piece.getId(), new Random().nextInt(gameLayout.getHeight() - piece.height));
                     set.applyTo(gameLayout);
@@ -88,6 +95,7 @@ public class ArrangePictureGame extends AppCompatActivity {
                 }
             }
         });
+
     }
 
     public ArrayList<PuzzlePiece> splitImage(ImageView picture){
@@ -110,12 +118,12 @@ public class ArrangePictureGame extends AppCompatActivity {
         int cropHeight = scaledBitmapHeight - 2 * Math.abs(scaledBitmapTop);
 
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, scaledBitmapWidth,scaledBitmapHeight,true);
-        Bitmap croppedBitmap = Bitmap.createBitmap(scaledBitmap, Math.abs(scaledBitmapLeft), Math.abs(scaledBitmapTop), cropWidth,cropHeight);
-
+        Bitmap croppedBitmap = Bitmap.createBitmap(scaledBitmap, Math.abs(scaledBitmapLeft), Math.abs(scaledBitmapTop), cropWidth, cropHeight);
 
         int pieceWidth = cropWidth / col;
         int pieceHeight = cropHeight / row;
-        System.out.println(pieceWidth + " " + pieceHeight);
+
+        System.out.println("pieceWidth: " + pieceWidth + ", pieceHeight: " + pieceHeight);
 
         int yCoord = 0;
         for(int r = 0; r < row; r++){
@@ -124,10 +132,13 @@ public class ArrangePictureGame extends AppCompatActivity {
                 Bitmap pieceBitmap = Bitmap.createBitmap(croppedBitmap, xCoord, yCoord, pieceWidth, pieceHeight);
                 PuzzlePiece piece = new PuzzlePiece(getApplicationContext());
                 piece.setImageBitmap(pieceBitmap);
+                piece.setAdjustViewBounds(true);
+                piece.setMaxHeight(pieceHeight);
+                piece.setMaxWidth(pieceWidth);
                 piece.xCoord = xCoord + picture.getLeft();
                 piece.yCoord = yCoord + picture.getTop();
-                piece.width = pieceWidth;
-                piece.height = pieceHeight;
+                piece.setWidth(pieceWidth);
+                piece.setHeight(pieceHeight);
                 pics.add(piece);
                 xCoord += pieceWidth;
             }
@@ -135,6 +146,7 @@ public class ArrangePictureGame extends AppCompatActivity {
         }
         return pics;
     }
+
 
     private int [] getBitmapPositionInside(ImageView picture) {
         int[] ret = new int[4];
@@ -156,74 +168,22 @@ public class ArrangePictureGame extends AppCompatActivity {
         ret[2] = actW;
         ret[3] = actH;
 
-        int pictureW = picture.getWidth() - actW;
-        int pictureH = picture.getHeight() - actH;
-        System.out.println(picture.getWidth() + " " + picture.getHeight());
+        int pictureW = picture.getWidth();
+        int pictureH = picture.getHeight();
 
-        int top = pictureH / 2;
-        int left = pictureW / 2;
+        System.out.println(actW + " W act H " + actH);
+        System.out.println(pictureW + " aaa " + pictureH);
+
+        int top = (pictureH - actH) / 2;
+        int left = (pictureW - actW)  / 2;
+
+        System.out.println(top + " top, left "+ left);
 
         ret[0] = left;
         ret[1] = top;
 
         return ret;
     }
-
-    /*
-    public class TouchListener implements View.OnTouchListener{
-        private float xDelta;
-        private float yDelta;
-
-        private ArrangePictureGame activity;
-
-        public TouchListener(ArrangePictureGame activity) {
-            this.activity = activity;
-        }
-
-        ConstraintLayout layout = findViewById(R.id.arrange_game);
-        int width = layout.getLayoutParams().width;
-        int height = layout.getLayoutParams().height;
-
-        @Override
-        public boolean onTouch(View view, MotionEvent e){
-            float x = e.getRawX();
-            float y = e.getRawY();
-            final double tolerance = Math.sqrt(Math.pow(view.getWidth(), 2) + Math.pow(view.getHeight(), 2)) / 5;
-
-            PuzzlePiece piece = (PuzzlePiece) view;
-            if (!piece.move) {
-                return true;
-            }
-
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) view.getLayoutParams();
-            switch (e.getAction() & MotionEvent.ACTION_MASK){
-                case MotionEvent.ACTION_DOWN:
-                    xDelta = x - params.leftMargin;
-                    yDelta = y - params.topMargin;
-                    piece.bringToFront();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    params.leftMargin = (int) (x - xDelta);
-                    params.topMargin = (int) (y - yDelta);
-                    view.setLayoutParams(params);
-                    break;
-                case MotionEvent.ACTION_UP:
-                    int xDiff = Math.abs(piece.xCoord - params.leftMargin);
-                    int yDiff = Math.abs(piece.yCoord - params.topMargin);
-                    if (xDiff <= tolerance && yDiff <= tolerance) {
-                        params.leftMargin = piece.xCoord;
-                        params.topMargin = piece.yCoord;
-                        piece.setLayoutParams(params);
-                        piece.move = false;
-                        sendViewToBack(piece);
-                        activity.checkGameOver();
-                    }
-                    break;
-            }
-            return true;
-        }
-    }
-    */
 
     private final class touchListener implements View.OnTouchListener{
         ArrangePictureGame activity;

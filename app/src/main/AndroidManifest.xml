@@ -21,6 +21,9 @@
         <activity android:name=".ArrangePictureGame" />
         <activity android:name=".PuzzlePiece" />
         <activity android:name=".TicTacToe" />
+        <activity android:name=".LoadDiary" />
+        <activity android:name=".Minigames" />
+        <activity android:name=".ChangeFont" />
 
         <meta-data
             android:name="preloaded_fonts"

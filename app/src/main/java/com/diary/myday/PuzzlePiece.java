@@ -14,4 +14,12 @@ public class PuzzlePiece extends AppCompatImageView {
     public PuzzlePiece(Context context){
         super(context);
     }
+
+    public void setWidth(int w){
+        this.width = w;
+    }
+
+    public void setHeight(int h){
+        this.height = h;
+    }
 }

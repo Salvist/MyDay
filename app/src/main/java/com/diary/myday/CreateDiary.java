@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.icu.util.Calendar;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -64,6 +66,7 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
     static final int stickerMax = 3;
 
     static final int SELECT_STICKER_RC = 1;
+    static final int FONT_FILE_NAME_RC = 5;
 
     @Override
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -86,6 +89,11 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void create_diary(View v){
         setContentView(R.layout.create_diary);
+        EditText dEditText = findViewById(R.id.diary);
+        Typeface tf = Typeface.createFromAsset(getAssets(), "sweet purple.ttf");
+
+        dEditText.setTypeface(tf);
+        dEditText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f);
         checkSettings();
         getDay();
     }
@@ -129,6 +137,7 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
         FILE_NAME = "diary_" + dayOfYear + ".txt";
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void save(View v) throws IOException {
         Context context = getApplicationContext();
         String folder = context.getFilesDir().getAbsolutePath() + FILE_DIR;
@@ -137,7 +146,12 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
             subFolder.mkdirs();
         }
 
+        EditText dEditText = findViewById(R.id.diary);
+
+        String font = "fonts/" + (String) dEditText.getTag() + ".ttf\n";
+
         String text = "Date: " + day + "\n";
+        text+= "font: " + font + "\n";
         for(int c = 0; c < 3; c++){
             if(stickerResSave[c] != 0){
                 text += "StickerId: " + stickerIdSave[c] + "\n";
@@ -149,7 +163,7 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
 
         text += "Message: \n";
 
-        EditText dEditText = findViewById(R.id.diary);
+
         text += dEditText.getText().toString();
         FileOutputStream fos = null;
         try{
@@ -205,24 +219,9 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
                 Intent addStickerIntent = new Intent(this, AddSticker.class);
                 startActivityForResult(addStickerIntent, SELECT_STICKER_RC);
                 return true;
-            case R.id.change_frame:
-                createLayout = findViewById(R.id.create_diary);
-                frame = new ImageView(CreateDiary.this);
-                EditText editText = findViewById(R.id.diary);
-                frame.setId(ImageView.generateViewId());
-                frame.setImageResource(R.drawable.frame_christmas);
-                frame.setAdjustViewBounds(true);
-                createLayout.addView(frame);
-
-                ConstraintSet set = new ConstraintSet();
-                set.clone(createLayout);
-                set.constrainHeight(frame.getId(), ConstraintSet.WRAP_CONTENT);
-                set.constrainWidth(frame.getId(), ConstraintSet.WRAP_CONTENT);
-                set.connect(frame.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
-                set.connect(frame.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0);
-                set.connect(frame.getId(), ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, 0);
-                set.connect(frame.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0);
-                set.applyTo(createLayout);
+            case R.id.change_font:
+                Intent changeFontIntent = new Intent(this, ChangeFont.class);
+                startActivityForResult(changeFontIntent, FONT_FILE_NAME_RC);
                 return true;
             default:
                 return false;
@@ -262,6 +261,16 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
                 stickerResSave[stickerCount] = stickerId;
                 image.getLocationOnScreen(stickerPosSave[stickerCount]);
                 stickerCount++;
+            }
+        }
+        if(requestCode == FONT_FILE_NAME_RC){
+            String fontFileName = data.getStringExtra("FONT_FILE_NAME");
+            if(fontFileName != null){
+                EditText dEditText = findViewById(R.id.diary);
+                Typeface tf = Typeface.createFromAsset(getAssets(), fontFileName);
+
+                dEditText.setTypeface(tf);
+                dEditText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f);
             }
         }
     }
