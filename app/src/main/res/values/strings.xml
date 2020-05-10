@@ -5,6 +5,8 @@
     <string name="open_diary">Open Diary</string>
     <string name="open_desc">Rediscover your own journey</string>
     <string name="open_s">Open</string>
+    <string name="mood_check">Mood Check</string>
+    <string name="mood_question">How are you feeling today?</string>
     <string name="close">Close</string>
 
     <string name="menu">Menu</string>
@@ -14,6 +16,7 @@
 
     <string name="option">Option</string>
     <string name="add_sticker">Add Sticker</string>
+    <string name="add_gif_sticker">Add Gif Sticker</string>
     <string name="font">Change Font</string>
     <string name="beathy">Beathy</string>
     <string name="fruity_stories">Fruity Stories</string>
@@ -37,6 +40,8 @@
     <string name="ttt">Tic Tac Toe!</string>
     <string name="xo">X/O</string>
     <string name="condition">You won!</string>
+    <string name="matching_game">Matching Game!</string>
+    <string name="match_finish">You matched all pictures!</string>
 
     <string name="save">Save Diary!</string>
     <string name="load">Load</string>

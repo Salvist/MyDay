@@ -34,8 +34,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
-    private static String FILE_NAME = "diary_";
-    private static String FILE_DIR;
     private static String BACKGROUND_COLOR;
 
     @RequiresApi(api = Build.VERSION_CODES.N)

@@ -88,13 +88,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/diary" />
 
-    <FrameLayout
-        android:id="@+id/frame"
-        android:layout_width="234dp"
-        android:layout_height="6dp"
-        app:layout_constraintStart_toStartOf="@+id/diary"
-        app:layout_constraintTop_toTopOf="@+id/diary">
-
-    </FrameLayout>
+    <ImageView
+        android:id="@+id/smiley_sticker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:alpha="0.7"
+        android:rotation="0"
+        app:layout_constraintBottom_toBottomOf="@+id/diary"
+        app:layout_constraintEnd_toEndOf="@+id/diary"
+        app:srcCompat="@drawable/smile1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

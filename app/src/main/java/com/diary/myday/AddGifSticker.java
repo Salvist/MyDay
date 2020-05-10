@@ -18,26 +18,22 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class AddSticker extends AppCompatActivity implements  StickersAdapter.ItemClickListener {
-    StickersAdapter adapter;
-    int[] images = {R.drawable.duck, R.drawable.cup_of_coffee, R.drawable.porcu_boba,
-                    R.drawable.catxd, R.drawable.pug, R.drawable.sanriocha_res,
-                    R.drawable.pusheen, R.drawable.monkey_sad, R.drawable.koala,
-                    R.drawable.rabbit_peek};
+public class AddGifSticker extends AppCompatActivity implements GifStickersAdapter.ItemClickListener{
+    GifStickersAdapter adapter;
+    int[] gifImages = {R.drawable.octowalk, R.drawable.hamtaramen, R.drawable.laying_cat, R.drawable.bunny_shake_head}; //gif images
 
-    public static final int SELECT_STICKER_RC = 1;
-
+    public static final int SELECT_GIF_STICKER_RC = 2;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.sticker_list);
+        setContentView(R.layout.gif_sticker_list);
         checkSettings();
 
-        RecyclerView rvStickers = findViewById(R.id.sticker_list);
+        RecyclerView rvStickers = findViewById(R.id.gif_sticker_list);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         rvStickers.setHasFixedSize(true);
         rvStickers.setLayoutManager(layoutManager);
-        adapter = new StickersAdapter(this, images);
+        adapter = new GifStickersAdapter(this, gifImages);
         adapter.setClickListener(this);
         rvStickers.setAdapter(adapter);
     }
@@ -45,8 +41,9 @@ public class AddSticker extends AppCompatActivity implements  StickersAdapter.It
     @Override
     public void onItemClick(View view, int position) {
         Intent intent = new Intent();
-        intent.putExtra("STICKER_ID", adapter.getItem(position));
-        setResult(SELECT_STICKER_RC, intent);
+        System.out.println("sticker id: " + adapter.getItem(position));
+        intent.putExtra("GIF_STICKER_ID", adapter.getItem(position));
+        setResult(SELECT_GIF_STICKER_RC, intent);
 
         finish();
     }
@@ -96,4 +93,5 @@ public class AddSticker extends AppCompatActivity implements  StickersAdapter.It
             }
         }
     }
+
 }

@@ -42,13 +42,26 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
         android:layout_marginLeft="64dp"
+        android:text="@string/play"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/play_text3"
+        app:layout_constraintEnd_toStartOf="@+id/play_puzzle_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play_text" />
+
+    <TextView
+        android:id="@+id/play_text3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginLeft="64dp"
         android:layout_marginBottom="128dp"
         android:text="@string/play"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/play_puzzle_text"
+        app:layout_constraintEnd_toStartOf="@+id/play_matching_text"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/play_text" />
+        app:layout_constraintTop_toBottomOf="@+id/play_text2" />
 
     <TextView
         android:id="@+id/play_ttt_text"
@@ -57,9 +70,9 @@
         android:layout_marginTop="128dp"
         android:layout_marginEnd="64dp"
         android:layout_marginRight="64dp"
+        android:onClick="start_ttt"
         android:text="@string/ttt"
         android:textSize="24sp"
-        android:onClick="start_ttt"
         app:layout_constraintBottom_toTopOf="@+id/play_puzzle_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/play_text"
@@ -71,12 +84,11 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="64dp"
         android:layout_marginRight="64dp"
-        android:layout_marginBottom="128dp"
+        android:clickable="true"
+        android:onClick="start_puzzle"
         android:text="@string/arrange_puzzle"
         android:textSize="24sp"
-        android:onClick="start_puzzle"
-        android:clickable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/play_matching_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/play_text2"
         app:layout_constraintTop_toBottomOf="@+id/play_ttt_text" />
@@ -92,5 +104,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/play_matching_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="64dp"
+        android:layout_marginRight="64dp"
+        android:layout_marginBottom="128dp"
+        android:text="@string/matching_game"
+        android:textSize="24sp"
+        android:onClick="start_matching_game"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/play_text3"
+        app:layout_constraintTop_toBottomOf="@+id/play_puzzle_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,14 +30,20 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import pl.droidsonroids.gif.GifImageView;
+
 public class LoadDiary extends AppCompatActivity implements OpenDiaryAdapter.ItemClickListener{
     private static String FILE_NAME = "diary_";
     private static String FILE_DIR;
 
+    private String date;
+    private String day;
+    private String font;
+
     ArrayList<String> listDiary = new ArrayList<>();
     OpenDiaryAdapter adapter;
 
-    String[] font = {"sweet purple.ttf", "Fruity Stories.ttf", "Sweety Rasty.otf", "Thysen J italic.ttf", "TYPEWR__.ttf", "Beathy Version.ttf"};
+    //String[] font = {"sweet purple.ttf", "Fruity Stories.ttf", "Sweety Rasty.otf", "Thysen J italic.ttf", "TYPEWR__.ttf", "Beathy Version.ttf"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,20 +90,23 @@ public class LoadDiary extends AppCompatActivity implements OpenDiaryAdapter.Ite
             StringBuilder sb = new StringBuilder();
 
             String text;
-            String day = "";
-            String font = null;
+            int happyStickerId = 0;
             int stickerIdLoad[] = {0, 0, 0};
+            Boolean animate[] = {false, false, false};
             Boolean message = false;
             int[][] stickerPosLoad = new int[3][2];
 
-            int c = 0;
+            int c = -1;
             while ((text = br.readLine()) != null){
                 if(message == false) {
                     if (text.startsWith("Date: ")) day = text.substring(6);
                     if (text.startsWith("font: ")) font = text.substring(6);
-                    if (text.startsWith("StickerId: ") && Integer.parseInt(text.substring(11)) == c+1) continue;
+                    if (text.startsWith("HappySticker: ")) happyStickerId = Integer.parseInt(text.substring(14));
                     if (text.startsWith("StickerId: ")) c++;
+                    //if (text.startsWith("StickerId: ") && Integer.parseInt(text.substring(11)) == c+1) continue;
+                    //if (text.startsWith("StickerId: ")) c++;
                     if (text.startsWith("StickerRes: ")) stickerIdLoad[c] = Integer.parseInt(text.substring(12));
+                    if (text.startsWith("Animated: ")) animate[c] = Boolean.parseBoolean(text.substring(10));
                     if (text.startsWith("StickerPosX: ")) stickerPosLoad[c][0] = Integer.parseInt(text.substring(13));
                     if (text.startsWith("StickerPosY: ")) stickerPosLoad[c][1] = Integer.parseInt(text.substring(13));
                     if (text.startsWith("Message: ")) message = true;
@@ -107,12 +117,16 @@ public class LoadDiary extends AppCompatActivity implements OpenDiaryAdapter.Ite
             dayLoad.setText(day);
 
             for(int i = 0; i < 3; ++i){
-                if(stickerIdLoad[i] != 0) loadSticker(stickerIdLoad[i], stickerPosLoad[i]);
+                if(stickerIdLoad[i] != 0) loadSticker(stickerIdLoad[i], animate[i], stickerPosLoad[i]);
             }
+            loadHappySticker(happyStickerId);
 
             dTextView.setText(sb.toString());
-            //Typeface typeface = Typeface.createFromAsset(getApplicationContext().getAssets(), font[0]);
-            //dTextView.setTypeface(typeface);
+            Typeface typeface = Typeface.createFromAsset(getApplicationContext().getAssets(), font);
+            dTextView.setTypeface(typeface);
+            dTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f);
+
+
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -130,25 +144,62 @@ public class LoadDiary extends AppCompatActivity implements OpenDiaryAdapter.Ite
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void loadSticker(int stickerIdLoad, int[] stickerPosLoad){
+    public void loadSticker(int stickerIdLoad, Boolean animate, int[] stickerPosLoad){
         ConstraintLayout loadLayout = findViewById(R.id.load_page);
         ConstraintSet set = new ConstraintSet();
         int HEIGHT_FIXER = 210;
         stickerPosLoad[1] -= HEIGHT_FIXER;
+        set.clone(loadLayout);
 
+        if(animate == false){
+            ImageView image = new ImageView(LoadDiary.this);
+            image.setId(ImageView.generateViewId());
+            image.setImageResource(stickerIdLoad);
+            image.setMaxWidth(300);
+            image.setAdjustViewBounds(true);
+            loadLayout.addView(image);
+
+            set.constrainHeight(image.getId(), ConstraintSet.WRAP_CONTENT);
+            set.constrainWidth(image.getId(), ConstraintSet.WRAP_CONTENT);
+            set.connect(image.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
+            set.setTranslation(image.getId(), stickerPosLoad[0], stickerPosLoad[1]);
+
+            set.applyTo(loadLayout);
+        } else {
+            GifImageView gifImage = new GifImageView(LoadDiary.this);
+            gifImage.setId(ImageView.generateViewId());
+            gifImage.setImageResource(stickerIdLoad);
+            gifImage.setMaxWidth(300);
+            gifImage.setAdjustViewBounds(true);
+            loadLayout.addView(gifImage);
+
+            set.constrainHeight(gifImage.getId(), ConstraintSet.WRAP_CONTENT);
+            set.constrainWidth(gifImage.getId(), ConstraintSet.WRAP_CONTENT);
+            set.connect(gifImage.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
+            set.setTranslation(gifImage.getId(), stickerPosLoad[0], stickerPosLoad[1]);
+
+            set.applyTo(loadLayout);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public void loadHappySticker(int happyStickerId){
+        ConstraintLayout loadLayout = findViewById(R.id.load_page);
+        TextView dTextView = findViewById(R.id.load_diary);
+        dTextView.setId(View.generateViewId());
+        ConstraintSet set = new ConstraintSet();
         set.clone(loadLayout);
 
         ImageView image = new ImageView(LoadDiary.this);
         image.setId(ImageView.generateViewId());
-        image.setImageResource(stickerIdLoad);
-        image.setMaxWidth(256);
-        image.setAdjustViewBounds(true);
-        loadLayout.addView(image);
+        image.setImageResource(happyStickerId);
+        image.setAlpha(0.7f);
+        loadLayout.addView(image, 0);
 
         set.constrainHeight(image.getId(), ConstraintSet.WRAP_CONTENT);
         set.constrainWidth(image.getId(), ConstraintSet.WRAP_CONTENT);
-        set.connect(image.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
-        set.setTranslation(image.getId(), stickerPosLoad[0], stickerPosLoad[1]);
+        set.connect(image.getId(), ConstraintSet.RIGHT, dTextView.getId(), ConstraintSet.RIGHT, 24);
+        set.connect(image.getId(), ConstraintSet.BOTTOM, dTextView.getId(), ConstraintSet.BOTTOM, 24);
 
         set.applyTo(loadLayout);
     }
@@ -156,7 +207,7 @@ public class LoadDiary extends AppCompatActivity implements OpenDiaryAdapter.Ite
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onItemClick(View view, int position){
-        Toast.makeText(this, "You clicked " + adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "You clicked " + adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
 
         if(listDiary.get(position).endsWith(".txt")){
             load(view, listDiary.get(position));
@@ -175,20 +226,6 @@ public class LoadDiary extends AppCompatActivity implements OpenDiaryAdapter.Ite
             listDiary.add(name);
         }
         adapter.notifyDataSetChanged();
-    }
-
-    public void edit(View v){
-
-        TextView dTextView = findViewById(R.id.load_diary);
-        EditText dEditText = findViewById(R.id.edit_diary);
-        dTextView.setVisibility(View.INVISIBLE);
-        dEditText.setText(dTextView.getText());
-        dEditText.setVisibility(View.VISIBLE);
-
-    }
-
-    public void edit_save(View v){
-
     }
 
     public void menu(View v){

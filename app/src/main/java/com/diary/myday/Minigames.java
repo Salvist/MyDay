@@ -36,6 +36,11 @@ public class Minigames extends AppCompatActivity {
         startActivity(gameIntent);
     }
 
+    public void start_matching_game(View view){
+        Intent gameIntent = new Intent(this, MatchingGame.class);
+        startActivity(gameIntent);
+    }
+
     public void back(View v){
         finish();
     }

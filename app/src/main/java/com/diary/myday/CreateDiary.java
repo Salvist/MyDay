@@ -17,6 +17,7 @@ import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -40,11 +41,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Random;
 
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
+
 public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener{
     private static String FILE_NAME;
     private static String FILE_DIR;
     private String date;
     private String day;
+    private String font = "sweet purple.ttf";
 
     private ConstraintLayout createLayout;
     private DisplayMetrics displayMetrics;
@@ -57,15 +62,20 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
     private int xDelta2;
     private int yDelta2;
 
+    private int happyStickerId;
     private ImageView image;
-    private ImageView frame;
+    private GifImageView gifImageView;
     private int[] stickerIdSave;
     private int[] stickerResSave;
+    private Boolean[] stickerAnimate = {false, false, false};
     private int[][] stickerPosSave;
     private static int stickerCount = 0;
     static final int stickerMax = 3;
 
+    int smiley_stickers[] = {R.drawable.smile1, R.drawable.smile2, R.drawable.smile3, R.drawable.smile4};
+
     static final int SELECT_STICKER_RC = 1;
+    static final int SELECT_GIF_STICKER_RC = 2;
     static final int FONT_FILE_NAME_RC = 5;
 
     @Override
@@ -87,13 +97,28 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void create_diary(View v){
+    public void happy_create_diary(View v){
         setContentView(R.layout.create_diary);
-        EditText dEditText = findViewById(R.id.diary);
-        Typeface tf = Typeface.createFromAsset(getAssets(), "sweet purple.ttf");
+        Random rand = new Random();
+        happyStickerId = smiley_stickers[rand.nextInt(4)];
+        ImageView happy_sticker = findViewById(R.id.smiley_sticker);
+        happy_sticker.setImageResource(happyStickerId);
+        stickerCount = 0;
 
-        dEditText.setTypeface(tf);
-        dEditText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f);
+        setEditText();
+        checkSettings();
+        getDay();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void okay_create_diary(View v){
+        setContentView(R.layout.create_diary);
+
+        ImageView happy_sticker = findViewById(R.id.smiley_sticker);
+        happy_sticker.setVisibility(View.INVISIBLE);
+        stickerCount = 0;
+
+        setEditText();
         checkSettings();
         getDay();
     }
@@ -101,16 +126,21 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void sad(View v){
         setContentView(R.layout.create_diary);
+        setEditText();
         getDay();
 
         Random rand = new Random();
-        int random_game = rand.nextInt(2);
+        int random_game = rand.nextInt(3);
         if(random_game == 0){
             Intent gameIntent = new Intent(this, TicTacToe.class);
             startActivity(gameIntent);
         }
         if(random_game == 1){
             Intent gameIntent = new Intent(this, ArrangePictureGame.class);
+            startActivity(gameIntent);
+        }
+        if(random_game == 2){
+            Intent gameIntent = new Intent(this, MatchingGame.class);
             startActivity(gameIntent);
         }
     }
@@ -125,7 +155,7 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
 
         dateTimeDisplay = findViewById(R.id.dayIndicator);
         calendar = Calendar.getInstance();
-        dateFormat = new SimpleDateFormat("MMMMM dd, yyyy");
+        dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
         date = dateFormat.format(calendar.getTime());
         dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
         day = "Day " + dayOfYear + " - " + date;
@@ -148,21 +178,21 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
 
         EditText dEditText = findViewById(R.id.diary);
 
-        String font = "fonts/" + (String) dEditText.getTag() + ".ttf\n";
-
         String text = "Date: " + day + "\n";
-        text+= "font: " + font + "\n";
+        text += "font: " + font + "\n";
+        text += "HappySticker: " + happyStickerId + "\n";
         for(int c = 0; c < 3; c++){
             if(stickerResSave[c] != 0){
                 text += "StickerId: " + stickerIdSave[c] + "\n";
                 text += "StickerRes: " + stickerResSave[c] + "\n";
+                if(stickerAnimate[c] == true) text += "Animated: true\n";
+                else text += "Animated: false\n";
                 text += "StickerPosX: " + stickerPosSave[c][0]  + "\n";
                 text += "StickerPosY: " + stickerPosSave[c][1] + "\n";
             }
         }
 
         text += "Message: \n";
-
 
         text += dEditText.getText().toString();
         FileOutputStream fos = null;
@@ -185,6 +215,7 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
                 }
             }
         }
+        finish();
     }
 
     public void menu(View view){
@@ -223,6 +254,14 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
                 Intent changeFontIntent = new Intent(this, ChangeFont.class);
                 startActivityForResult(changeFontIntent, FONT_FILE_NAME_RC);
                 return true;
+            case R.id.add_gif_stickers:
+                if(stickerCount == stickerMax){
+                    Toast.makeText(this, "Only 3 stickers at max!", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                Intent addGifStickerIntent = new Intent(this, AddGifSticker.class);
+                startActivityForResult(addGifStickerIntent, SELECT_GIF_STICKER_RC);
+                return true;
             default:
                 return false;
         }
@@ -234,17 +273,16 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == SELECT_STICKER_RC){
             int stickerId = data.getIntExtra("STICKER_ID", 0);
+            System.out.println(stickerId);
             if(stickerId != 0) {
                 createLayout = findViewById(R.id.create_diary);
                 ConstraintSet set = new ConstraintSet();
                 set.clone(createLayout);
-
                 image = new ImageView(CreateDiary.this);
-                image.setId(ImageView.generateViewId());
+                image.setId(View.generateViewId());
                 image.setImageResource(stickerId);
-                image.setMaxWidth(256);
+                image.setMaxWidth(300);
                 image.setAdjustViewBounds(true);
-
                 image.setOnTouchListener(new touchListener());
 
                 createLayout.addView(image);
@@ -259,15 +297,62 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
 
                 stickerIdSave[stickerCount] = image.getId();
                 stickerResSave[stickerCount] = stickerId;
-                image.getLocationOnScreen(stickerPosSave[stickerCount]);
+
+                System.out.println("width " + image.getMaxWidth());
+
+                //image.getLocationOnScreen(stickerPosSave[stickerCount]);
+                stickerPosSave[stickerCount][0] = screenWidth / 2 - 128;
+                stickerPosSave[stickerCount][1] = screenHeight / 2 - 53;
+
                 stickerCount++;
             }
         }
+
+        if(requestCode == SELECT_GIF_STICKER_RC){
+            int stickerId = data.getIntExtra("GIF_STICKER_ID", 0);
+            System.out.println("sticker id is: " + stickerId);
+            if(stickerId != 0){
+                createLayout = findViewById(R.id.create_diary);
+                ConstraintSet set = new ConstraintSet();
+                set.clone(createLayout);
+                gifImageView = new GifImageView(CreateDiary.this);
+                try {
+                    GifDrawable gifDrawable = new GifDrawable(getResources(), stickerId);
+                    gifImageView.setId(View.generateViewId());
+                    gifImageView.setTag("animated");
+                    gifImageView.setImageDrawable(gifDrawable);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                gifImageView.setMaxWidth(300);
+                gifImageView.setAdjustViewBounds(true);
+                gifImageView.setOnTouchListener(new touchListener());
+                createLayout.addView(gifImageView);
+                set.constrainHeight(gifImageView.getId(), ConstraintSet.WRAP_CONTENT);
+                set.constrainWidth(gifImageView.getId(), ConstraintSet.WRAP_CONTENT);
+                set.connect(gifImageView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
+                set.connect(gifImageView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0);
+                set.connect(gifImageView.getId(), ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, 0);
+                set.connect(gifImageView.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0);
+                set.applyTo(createLayout);
+
+                stickerIdSave[stickerCount] = gifImageView.getId();
+                stickerResSave[stickerCount] = stickerId;
+                stickerAnimate[stickerCount] = true;
+
+                stickerPosSave[stickerCount][0] = screenWidth / 2 - 128;
+                stickerPosSave[stickerCount][1] = screenHeight / 2 - 53;
+
+                stickerCount++;
+            }
+        }
+
         if(requestCode == FONT_FILE_NAME_RC){
             String fontFileName = data.getStringExtra("FONT_FILE_NAME");
             if(fontFileName != null){
                 EditText dEditText = findViewById(R.id.diary);
                 Typeface tf = Typeface.createFromAsset(getAssets(), fontFileName);
+                font = fontFileName;
 
                 dEditText.setTypeface(tf);
                 dEditText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f);
@@ -293,9 +378,18 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
                     return true;
                 case MotionEvent.ACTION_UP:
                     System.out.println("Action was UP");
-                    if(image.getId() == stickerIdSave[0]) image.getLocationOnScreen(stickerPosSave[0]);
-                    if(image.getId() == stickerIdSave[1]) image.getLocationOnScreen(stickerPosSave[1]);
-                    if(image.getId() == stickerIdSave[2]) image.getLocationOnScreen(stickerPosSave[2]);
+                    if(view.getTag() == null){
+                        System.out.println("view is instance of imageview");
+                        if(image.getId() == stickerIdSave[0]) image.getLocationOnScreen(stickerPosSave[0]);
+                        if(image.getId() == stickerIdSave[1]) image.getLocationOnScreen(stickerPosSave[1]);
+                        if(image.getId() == stickerIdSave[2]) image.getLocationOnScreen(stickerPosSave[2]);
+                    } else {
+                        System.out.println("view is instance of gifimageview");
+                        if(gifImageView.getId() == stickerIdSave[0]) gifImageView.getLocationOnScreen(stickerPosSave[0]);
+                        if(gifImageView.getId() == stickerIdSave[1]) gifImageView.getLocationOnScreen(stickerPosSave[1]);
+                        if(gifImageView.getId() == stickerIdSave[2]) gifImageView.getLocationOnScreen(stickerPosSave[2]);
+                    }
+
                     return true;
                 case MotionEvent.ACTION_MOVE:
                     if (width == screenWidth && height == screenHeight){}
@@ -307,7 +401,6 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
                                 .start();
 
                         if (e.getRawX() + xDelta + width > screenWidth) {
-                            System.out.println("boundary right x");
                             view.animate()
                                     .x(screenWidth - width)
                                     .setDuration(0)
@@ -326,7 +419,6 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
                                     .start();
                         }
                         if (e.getRawY() + yDelta < 0) {
-                            System.out.println("boundary upper y ");
                             view.animate()
                                     .y(0)
                                     .setDuration(0)
@@ -337,6 +429,14 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
             }
             return true;
         }
+    }
+
+    public void setEditText(){
+        EditText dEditText = findViewById(R.id.diary);
+        Typeface tf = Typeface.createFromAsset(getAssets(), "sweet purple.ttf");
+
+        dEditText.setTypeface(tf);
+        dEditText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f);
     }
 
     public void checkSettings(){
