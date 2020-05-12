@@ -358,6 +358,10 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
                 dEditText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f);
             }
         }
+
+        if(requestCode == RESULT_OK){
+
+        }
     }
 
     private final class touchListener implements View.OnTouchListener{

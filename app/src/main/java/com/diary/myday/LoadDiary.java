@@ -43,8 +43,6 @@ public class LoadDiary extends AppCompatActivity implements OpenDiaryAdapter.Ite
     ArrayList<String> listDiary = new ArrayList<>();
     OpenDiaryAdapter adapter;
 
-    //String[] font = {"sweet purple.ttf", "Fruity Stories.ttf", "Sweety Rasty.otf", "Thysen J italic.ttf", "TYPEWR__.ttf", "Beathy Version.ttf"};
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,8 +101,6 @@ public class LoadDiary extends AppCompatActivity implements OpenDiaryAdapter.Ite
                     if (text.startsWith("font: ")) font = text.substring(6);
                     if (text.startsWith("HappySticker: ")) happyStickerId = Integer.parseInt(text.substring(14));
                     if (text.startsWith("StickerId: ")) c++;
-                    //if (text.startsWith("StickerId: ") && Integer.parseInt(text.substring(11)) == c+1) continue;
-                    //if (text.startsWith("StickerId: ")) c++;
                     if (text.startsWith("StickerRes: ")) stickerIdLoad[c] = Integer.parseInt(text.substring(12));
                     if (text.startsWith("Animated: ")) animate[c] = Boolean.parseBoolean(text.substring(10));
                     if (text.startsWith("StickerPosX: ")) stickerPosLoad[c][0] = Integer.parseInt(text.substring(13));

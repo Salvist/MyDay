@@ -22,12 +22,14 @@ public class AddGifSticker extends AppCompatActivity implements GifStickersAdapt
     GifStickersAdapter adapter;
     int[] gifImages = {R.drawable.octowalk, R.drawable.hamtaramen, R.drawable.laying_cat, R.drawable.bunny_shake_head}; //gif images
 
+    Intent intent = new Intent();
     public static final int SELECT_GIF_STICKER_RC = 2;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gif_sticker_list);
         checkSettings();
+        setResult(RESULT_CANCELED, intent);
 
         RecyclerView rvStickers = findViewById(R.id.gif_sticker_list);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
@@ -40,7 +42,6 @@ public class AddGifSticker extends AppCompatActivity implements GifStickersAdapt
 
     @Override
     public void onItemClick(View view, int position) {
-        Intent intent = new Intent();
         System.out.println("sticker id: " + adapter.getItem(position));
         intent.putExtra("GIF_STICKER_ID", adapter.getItem(position));
         setResult(SELECT_GIF_STICKER_RC, intent);

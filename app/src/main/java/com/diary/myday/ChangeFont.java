@@ -27,6 +27,9 @@ public class ChangeFont extends AppCompatActivity {
         setContentView(R.layout.font_list);
         checkSettings();
 
+        final Intent intent = new Intent();
+        setResult(RESULT_CANCELED, intent);
+
         TextView[] fontTV = new TextView[6];
         fontTV[0] = findViewById(R.id.font1);
         fontTV[1] = findViewById(R.id.font2);
@@ -34,8 +37,6 @@ public class ChangeFont extends AppCompatActivity {
         fontTV[3] = findViewById(R.id.font4);
         fontTV[4] = findViewById(R.id.font5);
         fontTV[5] = findViewById(R.id.font6);
-
-        EditText dEditText = findViewById(R.id.diary);
 
         for(int i = 0; i < 6; i++){
             String fontName = fontTV[i].getText().toString();
@@ -53,7 +54,6 @@ public class ChangeFont extends AppCompatActivity {
             fontTV[i].setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent();
                     intent.putExtra("FONT_FILE_NAME", finalFontName);
                     setResult(5, intent);
                     finish();

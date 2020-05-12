@@ -25,6 +25,7 @@ public class AddSticker extends AppCompatActivity implements  StickersAdapter.It
                     R.drawable.pusheen, R.drawable.monkey_sad, R.drawable.koala,
                     R.drawable.rabbit_peek};
 
+    Intent intent = new Intent();
     public static final int SELECT_STICKER_RC = 1;
 
     @Override
@@ -32,6 +33,7 @@ public class AddSticker extends AppCompatActivity implements  StickersAdapter.It
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sticker_list);
         checkSettings();
+        setResult(RESULT_CANCELED, intent);
 
         RecyclerView rvStickers = findViewById(R.id.sticker_list);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
@@ -44,7 +46,6 @@ public class AddSticker extends AppCompatActivity implements  StickersAdapter.It
 
     @Override
     public void onItemClick(View view, int position) {
-        Intent intent = new Intent();
         intent.putExtra("STICKER_ID", adapter.getItem(position));
         setResult(SELECT_STICKER_RC, intent);
 
