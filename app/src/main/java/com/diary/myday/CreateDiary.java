@@ -126,6 +126,10 @@ public class CreateDiary extends AppCompatActivity implements PopupMenu.OnMenuIt
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void sad(View v){
         setContentView(R.layout.create_diary);
+
+        ImageView happy_sticker = findViewById(R.id.smiley_sticker);
+        happy_sticker.setVisibility(View.INVISIBLE);
+        stickerCount = 0;
         setEditText();
         getDay();
 
